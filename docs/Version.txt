@@ -1,0 +1,31 @@
+Space Impact : The Lone Survivor (Build 1.0/alpha-3)
+
+Author: theDesertEagle (a.k.a. Jas)
+
+New Additions To (Build 1.0/alpha-3):
++ Added Cheat Codes
++ Added Limited Spaceship Ammo 
++ Improved Visual Instructions Page
++ Added Player Control FPS Style
+
+Known Issues:
+- Laggyness still persists
+- Incompatible with mobile devices
+
+Older Versions:
+
+(Build 1.0/alpha-2):
++ Added Sound Effects
++ Added Background Music
++ Fixed Spaceship Collision With World Boundaries
++ Added Instructions Page
+
+(Build 1.0/alpha-1):
++ Added 2 More Enemies
++ Fixed Background Image Issue
++ Added Landing Page
++ Enabling Shooting Enemy 
+
+(Build 0.9)
++ Creation of One Enemy With Spaceship
++ Added Player Score

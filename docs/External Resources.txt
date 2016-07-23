@@ -1,0 +1,19 @@
+Space Impact : The Lone Survivor (Build 1.0/alpha-3)
+Author: theDesertEagle (a.k.a. Jas)
+
+Disclaimer: I do not own or endorse any of the following resources mentioned below, and I have just used them for educational purposes 
+	    only. These resources are the works belonging to their respective authors, and I do not intend to steal or monetize
+	    their hardwork for unpair means. 
+
+---Images---
++ background.jpg
++ instructionsPage.jpg
++ landingPageBackground.jpg
+
+---Audio---
++ enemyDead.ogg (edited by me)
++ music.ogg (Lawless ft. Speaking In Tongues - One Way (a.k.a. Daniel Heath - One Way)
++ spaceshipShoot.ogg
+(In order to acquire the audio resources, kindly contact the guys concerned \) 
+
+And of course, a big thanks to the Phaser.js community for all of their support for this project! 

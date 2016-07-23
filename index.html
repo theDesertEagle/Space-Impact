@@ -1,0 +1,621 @@
+
+<!-- NOTE: ZOOM OUT/IN TO READ 																																				 -->
+<!-- _______________________________________________________________________________________________________________________________________________________________________ -->
+<!-- 																																										 -->
+<!-- 																	Welcome to Spact Impact Source Code! 																 -->
+<!--																	       Build 1.0 - alpha 3.0 										    							 -->
+<!-- 										    																															 -->
+<!-- Space Impact is a based on the classic 2D Black and White Game - Space Impact For Nokia. You know the rules. Travel through the galaxy and destroy the enemy minions.   -->
+<!-- The game is a never ending one; survive the minions as long as possible. The entire game uses the basic Arcade System of Phaser to take care of the motion control.     -->
+<!-- This game is just the platform, on which you can further build your game story  if needed. So use this just as a basic structure for the game. Feel free to push any 	 -->
+<!-- modifications/ suggestions. I shall respond to it asap. Happy tinkering :) 																							 -->
+<!-- 																																										 -->
+<!-- Cheers!																																								 -->
+<!-- 																																										 -->
+<!-- DesertEagle (a.k.a. Jas) 																																				 -->
+<!-- 																																										 -->
+<!-- _______________________________________________________________________________________________________________________________________________________________________ -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Space Impact
+	</title>
+	<style type="text/css">
+		body {
+			margin:0px; /*removes white space margin from the game border*/
+			background-image: url("img/landingPageBackground.jpg");
+			-webkit-background-size: cover;
+			background-size: cover; 
+			margin:auto;
+			text-align: center;
+
+		}
+
+		img.title {
+			height: 500px;
+			width: 800px;
+		}
+
+		img.instructions {
+			height: 400px;
+			width: 1000px;
+		}
+
+		img.controls{
+				height: 200px; 
+				width:1500px; 
+				margin-left: 40px;
+		}
+
+		button {
+			color:#1e5d9e;
+			font-family: sans-serif;
+			font-size: 30px;
+			border: 8px solid #1e5d9e;
+			background-color: #7bbcff;
+			padding:30px;
+			border-radius: 20px;	 	
+		}
+
+		button:focus {
+			color:#1e5d9e;
+			font-family: sans-serif;
+			font-size: 30px;
+			border: 8px solid #1e5d9e;
+			background-color: #7bbcff;
+			padding:30px;
+			border-radius: 20px;
+			outline:0;		
+		}
+
+		button:hover{
+			color:#80BBF9;
+			font-family: sans-serif;
+			font-size: 30px;
+			border: 8px solid #58A2EC;
+			background-color: #3C8BDC;
+			padding:30px;
+			border-radius: 20px;		
+		}
+
+		.gotit{
+			margin-left: 80px;
+		}
+
+
+	</style>
+	
+	<!-- Game Library: Phaser -->
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+</head>
+<body id="body">
+<img src="img/Title.png" class="title" alt="Space Impact"></img><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<button type="button" onclick="instructions()" autofocus id="start"><b>START GAME</b></button>
+
+
+<div class="game">
+
+<script type="text/javascript">
+graphicsMode = "CANVAS";
+var audio = new Audio('audio/music.ogg');
+choice = new Audio('audio/enemyDead.ogg');
+audio.play();
+function instructions() {
+	$('#control').remove();
+	$('#start').remove();
+	$('body').css('background-image','url("img/instructionsPage.jpg")');
+	document.body.innerHTML = "";	
+	$('body').append('<br><img src="img/Instructions.png" class="instructions" alt="Instructions"><br></img><br><br><br><br><br><br><br><br><button type="button" class="gotit" onclick="startGame()" id="gotita" autofocus><b>GOT IT</b></button><br><br><br><br><img src="img/ControlsDouble.png" class="controls" alt="Controls" id="control"></img>');
+	$('#gotita').focus();
+	 $(document).keydown(
+        function(e) {
+            if(e.keyCode == 49) {
+            	graphicsMode = "CANVAS";
+            	choice.play();
+            }
+            else if(e.keyCode == 50) {
+            	graphicsMode = "WEBGL";
+            	choice.play();	
+            }
+
+       return;
+        }
+
+        )
+}
+
+function startGame(){
+document.body.innerHTML = "";
+paused = 0;
+if(graphicsMode == "CANVAS"){
+	var game = new Phaser.Game("100", "100", Phaser.CANVAS, '', { preload: preload, create: create, update: update });	
+}
+else {
+	var game = new Phaser.Game("100", "100", Phaser.WEBGL, '', { preload: preload, create: create, update: update });		
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////Preloading Of Game Assets
+function preload() {
+	game.load.image('background','img/background.jpg');
+	game.load.image('minion','img/EnemyMinion.png');
+	game.load.image('rocket','img/EnemyRocket.png');
+	game.load.image('spider','img/EnemySpider.png');
+	game.load.image('enemyBullet','img/EnemyBullet.png');
+	game.load.image('spaceship','img/Spaceship.png');
+	game.load.image('bullet','img/Bullet.png');
+	game.load.image('boundary','img/Boundary.png');
+	game.load.image('gameOver','img/GameOver.png');
+	game.load.audio('laser', 'audio/spaceshipShoot.ogg');
+	game.load.audio('enemyDead', 'audio/enemyDead.ogg');
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////Creation Of Initial Game Assets
+function create() {
+	background = game.add.sprite(0,0,'background');
+	background.height = game.height;
+	background.width = game.width;
+
+	game.physics.startSystem(Phaser.Physics.ARCADE); //Enabling Arcade System
+	
+	player = game.add.group();
+	player.enableBody = true;
+	//player.collideWorldBounds = true;
+	spaceship = player.create(100,game.world.height/2,'spaceship');
+	spaceship.body.collideWorldBounds = true;
+	spaceship.body.bounce.y = 0;		//change after stable release
+	spaceship.anchor.setTo(0.5,0.5);
+	spaceship.angle = 90;
+	spaceship.scale.setTo(-0.25,0.25);
+	spaceship.events.onInputOver.add(function(){createSpaceshipBullet();});
+	spaceship.events.onInputDown.add(function(){createSpaceshipBullet();});
+
+	bulletTimer = 0;
+	enemyBulletTimer = 0;
+	enemyRespawnTimer = 1000;
+
+	enemyBullet = 0;
+
+
+	incrementBulletTimer = 300;
+	incrementEnemyRespawnTimer = 4000;
+
+
+	spaceshipBulletGroup = game.add.group();
+	spaceshipBulletGroup.enableBody = true;
+	spaceshipBullet = null;
+
+	enemyMinionGroup = game.add.group();
+	enemyMinionGroup.enableBody = true;
+	enemyMinion = null;
+
+	enemySpiderGroup = game.add.group();
+	enemySpiderGroup.enableBody = true;
+	enemySpider = null;
+
+	enemyRocketGroup = game.add.group();
+	enemyRocketGroup.enableBody = true;
+	enemyRocket = null;
+
+	boundaries = game.add.group();
+	boundaries.enableBody = true;
+	boundaryLeft = boundaries.create(0-140,-30,'boundary');
+	boundaryLeft.body.immovable = true;
+	boundaryLeft.scale.setTo(1,4);
+
+	boundaryRight = boundaries.create(game.world.width-10,-30,'boundary');
+	boundaryRight.body.immovable = true;
+	boundaryRight.scale.setTo(1,4);
+
+	enemyBulletGroup = game.add.group();
+	enemyBulletGroup.enableBody = true;
+	enemyBullet = null;
+
+	score = 0;
+	scoreText = game.add.text(40, 20, 'score: 0', { fontSize: '40px', fill: '#fff' });
+	ammo = 30;
+	ammoText = game.add.text(game.world.width-250, 20, 'ammo: 30', { fontSize: '40px', fill: '#fff' });
+
+	flag = "";
+
+	playerStatus="Mortal";
+	speedChanger = 0;
+
+	lives = 3;
+	livesSpaceship1 = game.add.sprite(game.world.width-400,20,'spaceship');
+	livesSpaceship1.scale.setTo(-0.1,0.1);
+	livesSpaceship2 = game.add.sprite(game.world.width-350,20,'spaceship');
+	livesSpaceship2.scale.setTo(-0.1,0.1);
+	livesSpaceship3 = game.add.sprite(game.world.width-300,20,'spaceship');
+	livesSpaceship3.scale.setTo(-0.1,0.1);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////Bullet Creation
+
+function createSpaceshipBullet() {
+	spaceshipBullet = spaceshipBulletGroup.create(spaceship.position.x + 90,spaceship.position.y,'bullet'); 
+	spaceshipBullet.anchor.setTo(-0.5,0.5);
+	spaceshipBullet.angle = 90;
+	spaceshipBullet.body.velocity.x = 800;
+	return spaceshipBullet;
+}
+
+function shootEnemyBullet(enemySpider) {
+	if(enemySpider.position.x > 50) {
+	enemyBullet = enemyBulletGroup.create(enemySpider.position.x - 90,enemySpider.position.y,'enemyBullet'); 
+	enemyBullet.anchor.setTo(0.5,0.5);
+	enemyBullet.scale.setTo(0.06,0.04);
+	enemyBullet.angle = 180;
+	enemyBullet.body.velocity.x = -500; 
+	enemyBullet.body.collideWorldBounds = false;
+	return enemyBullet;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////Enemy Creation
+
+function createEnemyMinion() {
+	positionY = Math.random() * (game.world.height-200);
+	if(positionY < 100) {
+		positionY += 200;
+	}
+	enemyMinion = enemyMinionGroup.create(game.world.width-100,positionY,'minion');//Math.Random * (game.world.height-50),'minion'); 
+	enemyMinion.anchor.setTo(0.5,0.5);
+	enemyMinion.scale.setTo(-0.23,0.23);
+	enemyMinion.angle = 180;
+	enemyMinion.body.velocity.x = -100; 
+	enemyMinion.body.collideWorldBounds = true;
+	enemyMinion.body.bounce.y = 1.0;
+	if(enemyMinion.position.y >= game.world.height/2) {
+		enemyMinion.body.acceleration.y = 650; 
+		enemyMinion.body.acceleration.x = -700; 
+		enemyMinion.body.velocity.y = 600;	
+
+	}
+	else {
+		enemyMinion.body.acceleration.y = -650; 
+		enemyMinion.body.acceleration.x = -700; 
+		enemyMinion.body.velocity.y = -600;	
+	}
+	return enemyMinion;
+}
+
+function createEnemySpider() {
+	positionY = Math.random() * (game.world.height-200);
+	if(positionY < 100) {
+		positionY += 200;
+	}
+	enemySpider = enemySpiderGroup.create(game.world.width-100,positionY,'spider'); 
+	enemySpider.anchor.setTo(0.5,0.5);
+	enemySpider.scale.setTo(-0.14,0.19);
+	enemySpider.angle = 180;
+	enemySpider.body.velocity.x = -200; 
+	enemySpider.body.collideWorldBounds = true;
+	enemySpider.body.bounce.y = 1.0;
+	if(enemySpider.position.y >= game.world.height/2) {
+		enemySpider.body.velocity.y = 200;	
+
+	}
+	else {
+		enemySpider.body.velocity.y = -200;	
+	}
+	return enemySpider;
+}
+
+function createEnemyRocket() {
+	positionY = Math.random() * (game.world.height-200);
+	if(positionY < 100) {
+		positionY += 200;
+	}
+	enemyRocket = enemyRocketGroup.create(game.world.width-100,positionY,'rocket'); 
+	enemyRocket.anchor.setTo(0.5,0.5);
+	enemyRocket.scale.setTo(-0.3,-0.3);
+	enemyRocket.angle = -180;
+	enemyRocket.body.velocity.x = -1400; 
+	enemyRocket.body.collideWorldBounds = true;
+	return enemyRocket;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////Important Functionalities
+
+function decreaseEnemyTimeGap(incrementer) {
+	if(incrementer > 400) {
+		incrementer -= 111;
+	} 
+	return incrementer;
+}
+
+function updateScore(scoreText) {
+	score += 10;
+    scoreText.text = 'score: ' + score;
+}
+
+function decreaseAmmo(scoreText) {
+	ammo -= 1;
+    ammoText.text = 'ammo: ' + ammo;
+}
+
+function increaseAmmo(scoreText) {
+	ammo += 2;
+    ammoText.text = 'ammo: ' + ammo;
+}
+
+function gameOver() {
+	game.add.sprite(game.world.width/2 -600,game.world.height/2 -300,'gameOver');
+}
+
+function enemyDeadSound() {
+	sound = game.add.audio('enemyDead');
+	sound.play();
+}
+
+function respawnPlayer() {
+	spaceship = player.create(100,game.world.height/2,'spaceship');
+	spaceship.body.collideWorldBounds = true;
+	spaceship.body.bounce.y = 0;		//change after stable release
+	spaceship.anchor.setTo(0.5,0.5);
+	spaceship.angle = 90;
+	spaceship.scale.setTo(-0.25,0.25);
+	ammo = 30;
+    ammoText.text = 'ammo: ' + ammo;
+}
+
+
+
+
+function reducePlayerLife(){
+	lives--;
+	if(lives == 2) {
+		livesSpaceship1.kill();
+		respawnPlayer();
+	}
+	else if(lives == 1) {
+		livesSpaceship2.kill();
+		respawnPlayer();
+	}
+	else if(lives == 0) {
+		livesSpaceship3.kill();
+		flag = "playerDead";
+		gameOver();
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////Game Loop
+
+function update() {
+	playerControls = game.input.keyboard.createCursorKeys();
+ 	keyS = game.input.keyboard.addKey(Phaser.Keyboard.S);
+ 	keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
+ 	keySpacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+ 	keyG = game.input.keyboard.addKey(Phaser.Keyboard.G);
+ 	keyO = game.input.keyboard.addKey(Phaser.Keyboard.O);
+ 	keyD = game.input.keyboard.addKey(Phaser.Keyboard.D);
+ 	keyM = game.input.keyboard.addKey(Phaser.Keyboard.M);
+ 	keyR = game.input.keyboard.addKey(Phaser.Keyboard.R);
+ 	keyA = game.input.keyboard.addKey(Phaser.Keyboard.A);
+ 	keyS = game.input.keyboard.addKey(Phaser.Keyboard.S);
+ 	keyC = game.input.keyboard.addKey(Phaser.Keyboard.C);
+ 	keyF = game.input.keyboard.addKey(Phaser.Keyboard.F);
+ 	keyL = game.input.keyboard.addKey(Phaser.Keyboard.L);
+ 	keyN = game.input.keyboard.addKey(Phaser.Keyboard.N);
+ 
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////Spaceship Shooting And Movement   
+ 	 
+ 	
+ 	if(flag != "playerDead") {
+ 	if (playerControls.right.isDown || keySpacebar.isDown){	
+ 		if(bulletTimer < game.time.now && ammo != 0) {
+        	spaceshipBullet = createSpaceshipBullet();
+        	decreaseAmmo();
+        	music = game.add.audio('laser');
+			music.play();
+        	bulletTimer = game.time.now + incrementBulletTimer;    	
+ 		}
+
+ 		if (playerControls.down.isDown || keyS.isDown){
+        spaceship.body.velocity.y = 500 + speedChanger;    	
+    	}
+   	    if (playerControls.up.isDown || keyW.isDown){
+    	    spaceship.body.velocity.y = -500 - speedChanger;    	
+	    }
+
+    }
+    else if (playerControls.down.isDown || keyS.isDown){
+        spaceship.body.velocity.y = 500 + speedChanger;    	
+    }
+    else if (playerControls.up.isDown || keyW.isDown){
+        spaceship.body.velocity.y = -500 - speedChanger;    	
+    }
+    else if ((playerControls.down.isUp && playerControls.up.isUp)||(keyS.isUp && keyW.isUp)){
+    	if(spaceship.body.velocity.y == 0) {
+    		spaceship.body.acceleration.y = 0;	
+    	} 
+    	(spaceship.body.velocity.y > 0) ? spaceship.body.acceleration.y = -500 : spaceship.body.acceleration.y = 500;  
+    }
+	}
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////Enemy Respawn
+
+    if(enemyRespawnTimer < game.time.now) {
+    	if(enemyRespawnTimer%3	 == 0) {
+    		enemySpider = createEnemySpider();
+    	}
+    	if(enemyRespawnTimer%2	 == 0) {
+ 		   	enemyMinion = createEnemyMinion();
+ 		}
+ 		if(enemyRespawnTimer%7	 == 0) {
+ 		   	enemyRocket = createEnemyRocket();
+ 		   	if(enemyRespawnTimer%2	 == 0) {
+ 		   		enemyRocket = createEnemyRocket();
+ 			}
+ 		}
+    	enemyRespawnTimer = game.time.now + incrementEnemyRespawnTimer;
+    	incrementEnemyRespawnTimer = decreaseEnemyTimeGap(incrementEnemyRespawnTimer);
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////Enemy Shooting
+
+    if(enemyBulletTimer < game.time.now && enemySpiderGroup.countLiving() > 0) {
+    	enemyBullet = shootEnemyBullet(enemySpider);
+    	enemyBulletTimer = game.time.now + 700;
+    		if(enemyBullet.position.y > spaceship.position.y) {
+    			enemyBullet.body.velocity.y = 50;
+    			enemyBullet.body.acceleration.y = -100;
+    		}
+    		else if(enemyBullet.position.y < spaceship.position.y) {
+    			enemyBullet.body.velocity.y = -50;				
+				enemyBullet.body.acceleration.y = 100;
+    		}
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////Collision Control 
+
+    game.physics.arcade.collide(enemyMinionGroup);
+    game.physics.arcade.collide(enemyRocketGroup);
+    game.physics.arcade.collide(enemySpiderGroup);
+    game.physics.arcade.collide(enemyMinionGroup,enemyRocketGroup);
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////Overlap Control
+
+	game.physics.arcade.overlap(boundaryLeft,enemyRocketGroup,function(boundary,enemy) {
+		enemy.kill();
+	},null,this);
+
+	game.physics.arcade.overlap(boundaryLeft,enemyMinionGroup,function(boundary,enemy) {
+		enemy.kill();
+	},null,this);
+
+	game.physics.arcade.overlap(boundaryLeft,enemySpiderGroup,function(boundary,enemy) {
+		enemy.kill();
+	},null,this);
+
+	game.physics.arcade.overlap(spaceshipBulletGroup,enemyMinionGroup,function(bullet,minion) {
+		minion.kill();
+		bullet.kill();
+		increaseAmmo();
+		enemyDeadSound();
+		updateScore(scoreText);
+	},null,this);
+	
+	game.physics.arcade.overlap(spaceshipBulletGroup,enemyRocketGroup,function(bullet,rocket) {
+		bullet.kill();		
+		updateScore(scoreText);
+	},null,this);
+	
+	game.physics.arcade.overlap(spaceshipBulletGroup,enemySpiderGroup,function(bullet,spider) {
+		spider.kill();
+		bullet.kill();
+		increaseAmmo();
+		enemyDeadSound();
+		updateScore(scoreText);
+	},null,this);
+	
+	game.physics.arcade.overlap(boundaryLeft,enemyBulletGroup,function(boundary,bullet) {
+		bullet.kill();
+	},null,this);
+	
+	game.physics.arcade.overlap(spaceshipBulletGroup,enemyBulletGroup,function(sBullet,eBullet) {
+		sBullet.kill();
+		eBullet.kill();
+	},null,this);
+	
+	game.physics.arcade.overlap(boundaryRight,spaceshipBulletGroup,function(boundary,bullet) {
+		bullet.kill();
+	},null,this);
+	
+	game.physics.arcade.overlap(player,enemyBulletGroup,function(player,bullet) {
+		bullet.kill();
+		if(playerStatus != "God") {
+			enemyDeadSound();
+			spaceship.kill();
+			//Player dies
+			reducePlayerLife();
+		}
+	},null,this);
+	
+	game.physics.arcade.overlap(player,enemySpiderGroup,function(player,enemy) {
+		enemyDeadSound();
+		enemy.kill();
+		if(playerStatus != "God") {
+			spaceship.kill();	
+			//Player dies
+			reducePlayerLife();
+		}
+		
+	},null,this);
+	
+	game.physics.arcade.overlap(player,enemyMinionGroup,function(player,enemy) {
+		enemy.kill();
+		enemyDeadSound();
+		if(playerStatus != "God") {
+			spaceship.kill();	
+			//Player dies
+			reducePlayerLife();
+		}
+	},null,this);
+	
+	game.physics.arcade.overlap(player,enemyRocketGroup,function(player,enemy) {
+		enemy.kill();
+		enemyDeadSound();
+		if(playerStatus != "God") {
+			spaceship.kill();	
+			//Player dies
+			reducePlayerLife();
+		}
+	},null,this);
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////Cheat Codes
+
+	if(keyG.isDown && keyG.isDown && keyD.isDown) {
+		playerStatus = "God";
+		enemyDeadSound(); 
+	}
+
+	if(keyM.isDown && keyO.isDown && keyR.isDown) {
+		playerStatus = "Mortal";
+		enemyDeadSound(); 
+	}
+
+	if(keyA.isDown && keyM.isDown && keyO.isDown) {
+		ammo += 100;
+		ammoText.text = 'ammo: ' + ammo;
+		enemyDeadSound();
+	}
+
+	if(keyS.isDown && keyC.isDown && keyO.isDown) {
+		score += 100;
+		scoreText.text = 'score: ' + score;
+		enemyDeadSound();
+	}
+
+	if(keyF.isDown && keyL.isDown) {
+		enemyDeadSound();
+		speedChanger = 500;
+	}
+
+	if(keyS.isDown && keyL.isDown) {
+		enemyDeadSound();
+		speedChanger = -300;
+	}
+
+	if(keyN.isDown && keyO.isDown && keyR.isDown) {
+		speedChanger = 0;
+		enemyDeadSound();
+	}
+
+}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////End Of Code
+
+</script>
+
+</div>
+
+</body>
+</html>

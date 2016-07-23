@@ -1,0 +1,15 @@
+Space Impact : The Lone Survivor (Build 1.0/alpha-3)
+Author: theDesertEagle (a.k.a. Jas)
+
+System Requirements:
+
++ Google Chrome Browser (latest version possible)
++ Windows/Linux/Mac Operating System
++ WEBGL and Javascript enabled browser
++ Intel 'i' Series Processor
++ Nvidia GT/GTX 7xx/8xx series GPU (or) AMD Radeon series GPU (if you wanna run it on WebGL)
++ Keyboard (preferrably QWERTY style)
++ Monitor Display (preferrably 1080HD)
++ Speakers (or) Headphones
+~ Mouse (Optional)
+~ Internet Connection (Optional)

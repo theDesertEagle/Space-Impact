@@ -1,5 +1,3 @@
-
-<!-- NOTE: ZOOM OUT/IN TO READ 																																				 -->
 <!-- _______________________________________________________________________________________________________________________________________________________________________ -->
 <!-- 																																										 -->
 <!-- 																	Welcome to Spact Impact Source Code! 																 -->
@@ -12,8 +10,9 @@
 <!-- 																																										 -->
 <!-- Cheers!																																								 -->
 <!-- 																																										 -->
-<!-- DesertEagle (a.k.a. Jas) 																																				 -->
+<!-- @the.desert.eagle 																																				         -->
 <!-- 																																										 -->
+<!-- Developer Notes: Due to Google's AutoPlay 2018 policy, the gamer would have to click once on the screen to enable the background music. Applies to Google Chrome only.  -->
 <!-- _______________________________________________________________________________________________________________________________________________________________________ -->
 
 <!DOCTYPE html>
@@ -91,7 +90,7 @@
 	<script type="text/javascript" src="js/phaser.min.js"></script>
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 </head>
-<body id="body">
+<body id="body" onclick="backgroundMusic()">
 <img src="img/Title.png" class="title" alt="Space Impact"></img><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 <button type="button" onclick="instructions()" autofocus id="start"><b>START GAME</b></button>
 
@@ -103,6 +102,11 @@ graphicsMode = "CANVAS";
 var audio = new Audio('audio/music.ogg');
 choice = new Audio('audio/enemyDead.ogg');
 audio.play();
+function backgroundMusic(){ //In-response to Google's AutoPlay Policy 2018
+	if(audio.paused){
+		audio.play();
+	}
+}
 function instructions() {
 	$('#control').remove();
 	$('#start').remove();

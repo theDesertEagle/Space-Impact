@@ -1,7 +1,7 @@
 ![Landing Page](/img/readme_pics/landing_screen.PNG?raw=true)
 
 ## Introduction
-Inspired by Nokia's old cell-phone classic game, 'Space-Impact: The Lone Survivor' is an endless scroll-based 2D space-shooter game, designed to function on any computer-supported web-browser by playing around with the DOM elements using the Phaser.js Framework. In the game, the player flys a spaceship in a distant galaxy to eliminate incoming swarm of enemies, which increase in number with time. The spacehsip's ammo is limited and gets replenished by one rocket as and when an enemy is destroyed. The video-game was locally tested using ngrok.  
+Inspired by Nokia's old cell-phone classic game, 'Space-Impact: The Lone Survivor' is an endless-based 2D space-shooter game, designed to function on any computer-supported web-browser by playing around with the DOM elements using the Phaser.js Framework. In the game, the player flys a spaceship in a distant galaxy to eliminate incoming swarm of enemies, which increase in number with time. The spacehsip's ammo is limited and gets replenished by one rocket as and when an enemy is destroyed. The video-game was locally tested using ngrok.  
 
 Note: As per Google's Autoplay Policy 2018, the player would have to click on the screen once to begin the background music if he/she is using Google Chrome. This does not apply for other web-broswers respectively. 
 
